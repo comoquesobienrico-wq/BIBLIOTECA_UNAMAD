@@ -1,0 +1,21 @@
+:root{
+  --color-fondo:#f6f7fb;
+  --color-texto:#0f172a;
+  --color-primario:#1d4ed8;
+  --color-borde:#e5e7eb;
+  --radio:12px;
+  --sombra:0 10px 30px rgba(2,6,23,.10);
+  --fuente:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,sans-serif;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family:var(--fuente);
+  color:var(--color-texto);
+  background:var(--color-fondo);
+}
+
+a{ color:var(--color-primario); text-decoration:none; }
+a:hover{ text-decoration:underline; }

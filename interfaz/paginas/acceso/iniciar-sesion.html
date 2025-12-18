@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acceso - Iniciar sesión</title>
+    <link rel="stylesheet" href="../../estilos/principal.css" />
+    <link rel="stylesheet" href="../../estilos/diseño.css" />
+    <link rel="stylesheet" href="../../estilos/componentes.css" />
+  </head>
+  <body>
+    <main class="contenedor">
+      <section class="tarjeta">
+        <div class="encabezado">
+          <h1 style="margin:0;">Iniciar sesión</h1>
+          <a class="boton" href="../../publico/inicio.html">Volver</a>
+        </div>
+
+        <form onsubmit="return false;">
+          <label class="campo">
+            <span>Correo</span>
+            <input class="entrada" type="email" name="email" autocomplete="username" required />
+          </label>
+          <label class="campo">
+            <span>Clave</span>
+            <input class="entrada" type="password" name="password" autocomplete="current-password" required />
+          </label>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button class="boton boton--primario" type="submit">Entrar</button>
+            <a href="./recuperar-clave.html">¿Olvidaste tu clave?</a>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script type="module">
+      import "../../scripts/app.js";
+    </script>
+  </body>
+</html>

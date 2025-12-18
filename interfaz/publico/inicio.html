@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biblioteca Universitaria - Inicio</title>
+    <link rel="stylesheet" href="../estilos/principal.css" />
+    <link rel="stylesheet" href="../estilos/diseño.css" />
+    <link rel="stylesheet" href="../estilos/componentes.css" />
+  </head>
+  <body>
+    <main class="contenedor">
+      <section class="tarjeta">
+        <div class="encabezado">
+          <h1 style="margin:0;">Biblioteca Universitaria</h1>
+          <div id="nav"></div>
+        </div>
+        <p style="margin-top:0;">
+          Bienvenido. Esta es una estructura base para el sistema de biblioteca.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a class="boton boton--primario" href="./catalogo-publico.html">Ver catálogo</a>
+          <a class="boton" href="../paginas/acceso/iniciar-sesion.html">Iniciar sesión</a>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import "../scripts/app.js";
+      import { renderBarraNavegacion } from "../scripts/interfaz/barra-navegacion.js";
+      renderBarraNavegacion(document.getElementById("nav"));
+    </script>
+  </body>
+</html>
