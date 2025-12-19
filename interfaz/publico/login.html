@@ -1,88 +1,274 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iniciar sesión</title>
-  <link rel="stylesheet" href="../estilos/principal.css">
-  <style>
-    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f3f4f6; }
-    .card { background: #fff; padding: 1.5rem; border-radius: 8px; width: 320px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-    .card h1 { margin: 0 0 1rem; font-size: 1.4rem; }
-    .field { margin-bottom: 0.75rem; display: flex; flex-direction: column; }
-    .field label { font-weight: 600; margin-bottom: 0.35rem; }
-    .field input { padding: 0.6rem 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; }
-    button { width: 100%; padding: 0.7rem; border: none; border-radius: 6px; background: #2563eb; color: #fff; font-weight: 700; cursor: pointer; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-    .error { color: #b91c1c; margin-top: 0.5rem; }
-    .success { color: #15803d; margin-top: 0.5rem; }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Iniciar sesión</h1>
-    <form id="login-form">
-      <div class="field">
-        <label for="username">Usuario</label>
-        <input type="text" id="username" name="username" required>
-      </div>
-      <div class="field">
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" name="password" required>
-      </div>
-      <button type="submit" id="submit">Entrar</button>
-      <div id="message"></div>
-    </form>
-  </div>
-
-  <script>
-    const form = document.getElementById('login-form');
-    const messageEl = document.getElementById('message');
-    const button = document.getElementById('submit');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      messageEl.textContent = '';
-      messageEl.className = '';
-      button.disabled = true;
-      button.textContent = 'Ingresando...';
-
-      try {
-        const res = await fetch('../../api/login.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: form.username.value.trim(),
-            password: form.password.value.trim(),
-          }),
-        });
-
-        const data = await res.json();
-        if (!res.ok || data.status !== 'ok') {
-          throw new Error(data.message || 'Error de autenticación');
-        }
-
-        messageEl.textContent = 'Login correcto, redirigiendo...';
-        messageEl.className = 'success';
-
-        // Redirige según el rol devuelto; ajusta las rutas de paneles.
-        const rol = data.user?.rol || 'usuario';
-        const destinos = {
-          administrador: '../paginas/administrador/index.html',
-          bibliotecario: '../paginas/bibliotecario/index.html',
-          usuario: '../paginas/usuario/index.html',
-        };
-        setTimeout(() => {
-          window.location.href = destinos[rol] || destinos.usuario;
-        }, 800);
-      } catch (err) {
-        messageEl.textContent = err.message;
-        messageEl.className = 'error';
-      } finally {
-        button.disabled = false;
-        button.textContent = 'Entrar';
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iniciar sesi&#243;n</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700&family=Playfair+Display:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../estilos/principal.css" />
+    <style>
+      body{
+        --color-primario:#0f766e;
+        --color-texto:#0b1220;
+        background:
+          radial-gradient(900px 520px at 5% 5%, rgba(15,118,110,.18), transparent 60%),
+          radial-gradient(900px 520px at 95% 20%, rgba(14,116,144,.2), transparent 55%),
+          linear-gradient(135deg, #f8efe1 0%, #eef5ff 40%, #fef3c7 100%);
+        font-family:"Manrope", "Segoe UI", sans-serif;
+        margin:0;
+        min-height:100vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:var(--color-texto);
       }
-    });
-  </script>
-</body>
+      .login-shell{
+        width:min(980px, 92vw);
+        display:grid;
+        grid-template-columns:1.1fr .9fr;
+        gap:28px;
+        align-items:center;
+        position:relative;
+      }
+      .login-shell::before{
+        content:"";
+        position:absolute;
+        inset:-30px;
+        background-image:radial-gradient(rgba(15,23,42,.08) 1px, transparent 0);
+        background-size:20px 20px;
+        opacity:.25;
+        pointer-events:none;
+        z-index:0;
+      }
+      .login-info,
+      .login-card{
+        position:relative;
+        z-index:1;
+      }
+      .login-info{
+        padding:18px 12px;
+      }
+      .login-eyebrow{
+        text-transform:uppercase;
+        letter-spacing:.18em;
+        font-size:.82rem;
+        color:rgba(15,23,42,.6);
+      }
+      .login-title{
+        font-family:"Playfair Display", "Times New Roman", serif;
+        font-size:clamp(2rem, 3vw + 1rem, 3.2rem);
+        margin:.6rem 0 1rem;
+      }
+      .login-subtitle{
+        font-size:1.05rem;
+        line-height:1.65;
+        color:rgba(15,23,42,.7);
+        margin:0 0 1.5rem;
+        max-width:420px;
+      }
+      .login-bullets{
+        list-style:none;
+        padding:0;
+        margin:0;
+        display:grid;
+        gap:10px;
+      }
+      .login-bullets li{
+        padding-left:20px;
+        position:relative;
+        color:rgba(15,23,42,.75);
+      }
+      .login-bullets li::before{
+        content:"";
+        width:8px;
+        height:8px;
+        border-radius:50%;
+        background:#f97316;
+        position:absolute;
+        left:0;
+        top:8px;
+      }
+      .login-card{
+        background:rgba(255,255,255,.92);
+        border-radius:20px;
+        padding:28px;
+        box-shadow:0 18px 40px rgba(15,23,42,.18);
+        border:1px solid rgba(15,23,42,.08);
+        backdrop-filter:blur(6px);
+      }
+      .login-card h1{
+        margin:0 0 8px;
+        font-size:1.5rem;
+      }
+      .login-card p{
+        margin:0 0 20px;
+        color:rgba(15,23,42,.65);
+      }
+      .field{
+        margin-bottom:14px;
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+      }
+      .field label{
+        font-weight:600;
+        font-size:.9rem;
+      }
+      .field input{
+        padding:12px 14px;
+        border-radius:12px;
+        border:1px solid rgba(15,23,42,.15);
+        background:#fff;
+        outline:none;
+      }
+      .field input:focus{
+        border-color:rgba(15,118,110,.6);
+        box-shadow:0 0 0 3px rgba(15,118,110,.15);
+      }
+      .btn{
+        width:100%;
+        padding:12px 16px;
+        border-radius:12px;
+        border:none;
+        background:var(--color-primario);
+        color:#fff;
+        font-weight:700;
+        cursor:pointer;
+        box-shadow:0 14px 30px rgba(15,118,110,.2);
+      }
+      .btn:disabled{
+        opacity:.7;
+        cursor:not-allowed;
+      }
+      .login-meta{
+        margin-top:14px;
+        display:flex;
+        justify-content:space-between;
+        font-size:.85rem;
+        color:rgba(15,23,42,.65);
+      }
+      .error{
+        color:#b91c1c;
+        margin-top:10px;
+        font-weight:600;
+      }
+      .success{
+        color:#15803d;
+        margin-top:10px;
+        font-weight:600;
+      }
+      @keyframes fadeUp{
+        from{ opacity:0; transform:translateY(16px); }
+        to{ opacity:1; transform:translateY(0); }
+      }
+      .animate{
+        animation:fadeUp .6s ease both;
+      }
+      @media (max-width: 900px){
+        .login-shell{
+          grid-template-columns:1fr;
+        }
+        .login-info{
+          text-align:center;
+        }
+        .login-subtitle,
+        .login-bullets{
+          margin-left:auto;
+          margin-right:auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="login-shell">
+      <section class="login-info animate">
+        <span class="login-eyebrow">UNAMAD - Biblioteca</span>
+        <h2 class="login-title">Bienvenido de vuelta</h2>
+        <p class="login-subtitle">
+          Accede a tu perfil para gestionar prestamos, reservas y notificaciones desde un solo lugar.
+        </p>
+        <ul class="login-bullets">
+          <li>Panel personalizado por rol</li>
+          <li>Historial y estado de solicitudes</li>
+          <li>Recordatorios y alertas clave</li>
+        </ul>
+      </section>
+
+      <section class="login-card animate">
+        <h1>Iniciar sesi&#243;n</h1>
+        <p>Ingresa tus credenciales para continuar.</p>
+        <form id="login-form">
+          <div class="field">
+            <label for="username">Usuario</label>
+            <input type="text" id="username" name="username" required />
+          </div>
+          <div class="field">
+            <label for="password">Contrasena</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+          <button class="btn" type="submit" id="submit">Entrar</button>
+          <div id="message"></div>
+        </form>
+        <div class="login-meta">
+          <span>Acceso seguro</span>
+          <span>Soporte 24/7</span>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById('login-form');
+      const messageEl = document.getElementById('message');
+      const button = document.getElementById('submit');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        messageEl.textContent = '';
+        messageEl.className = '';
+        button.disabled = true;
+        button.textContent = 'Ingresando...';
+
+        try {
+          const res = await fetch('../../api/login.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: form.username.value.trim(),
+              password: form.password.value.trim(),
+            }),
+          });
+
+          const data = await res.json();
+          if (!res.ok || data.status !== 'ok') {
+            throw new Error(data.message || 'Error de autenticacion');
+          }
+
+          messageEl.textContent = 'Login correcto, redirigiendo...';
+          messageEl.className = 'success';
+
+          // Redirige segun el rol devuelto; ajusta las rutas de paneles.
+          const rol = data.user?.rol || 'usuario';
+          const destinos = {
+            administrador: '../paginas/administrador/index.html',
+            bibliotecario: '../paginas/bibliotecario/index.html',
+            usuario: '../paginas/usuario/index.html',
+          };
+          setTimeout(() => {
+            window.location.href = destinos[rol] || destinos.usuario;
+          }, 800);
+        } catch (err) {
+          messageEl.textContent = err.message;
+          messageEl.className = 'error';
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Entrar';
+        }
+      });
+    </script>
+  </body>
 </html>
