@@ -4,23 +4,242 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Biblioteca Universitaria - Inicio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700&family=Playfair+Display:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../estilos/principal.css" />
-    <link rel="stylesheet" href="../estilos/diseño.css" />
+    <link rel="stylesheet" href="../estilos/dise�o.css" />
     <link rel="stylesheet" href="../estilos/componentes.css" />
+    <style>
+      body.inicio{
+        --color-primario:#0f766e;
+        --color-texto:#0b1220;
+        --color-borde:rgba(15,23,42,.12);
+        background:
+          radial-gradient(900px 500px at 10% 10%, rgba(15,118,110,.14), transparent 60%),
+          radial-gradient(800px 520px at 90% 20%, rgba(14,116,144,.18), transparent 55%),
+          linear-gradient(135deg, #f8efe1 0%, #eef5ff 40%, #fef3c7 100%);
+        font-family:"Manrope", "Segoe UI", sans-serif;
+        position:relative;
+        overflow-x:hidden;
+      }
+      body.inicio::before{
+        content:"";
+        position:absolute;
+        inset:0;
+        background-image:
+          radial-gradient(rgba(15,23,42,.08) 1px, transparent 0);
+        background-size:20px 20px;
+        opacity:.2;
+        pointer-events:none;
+      }
+      .inicio__contenedor{
+        padding:48px 0 72px;
+        position:relative;
+        z-index:1;
+      }
+      .inicio__hero{
+        display:grid;
+        grid-template-columns:1.1fr .9fr;
+        gap:32px;
+        align-items:center;
+      }
+      .inicio__copy{
+        display:flex;
+        flex-direction:column;
+        gap:24px;
+      }
+      .inicio__eyebrow{
+        font-size:.85rem;
+        text-transform:uppercase;
+        letter-spacing:.18em;
+        color:rgba(15,23,42,.6);
+      }
+      .inicio__titulo{
+        font-family:"Playfair Display", "Times New Roman", serif;
+        font-size:clamp(2.2rem, 3vw + 1rem, 3.4rem);
+        margin:8px 0 0;
+      }
+      .inicio__subtitulo{
+        font-size:1.05rem;
+        line-height:1.6;
+        margin:0;
+        color:rgba(15,23,42,.75);
+        max-width:520px;
+      }
+      .inicio__acciones{
+        display:flex;
+        flex-wrap:wrap;
+        gap:12px;
+      }
+      .inicio__cta{
+        padding:12px 18px;
+        font-weight:600;
+        box-shadow:0 14px 30px rgba(15,118,110,.2);
+      }
+      .boton--secundario{
+        background:rgba(255,255,255,.7);
+        border-color:rgba(15,23,42,.2);
+        backdrop-filter:blur(6px);
+      }
+      .inicio__stats{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:12px;
+      }
+      .inicio__stat{
+        background:rgba(255,255,255,.65);
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:14px;
+        padding:12px 14px;
+      }
+      .inicio__stat-num{
+        font-weight:700;
+        font-size:1.1rem;
+        display:block;
+      }
+      .inicio__stat-text{
+        font-size:.85rem;
+        color:rgba(15,23,42,.65);
+      }
+      .inicio__panel{
+        background:rgba(255,255,255,.9);
+        border-radius:20px;
+        padding:24px;
+        box-shadow:0 18px 40px rgba(15,23,42,.18);
+        position:relative;
+        overflow:hidden;
+      }
+      .inicio__panel::after{
+        content:"";
+        position:absolute;
+        inset:-40% -20% auto auto;
+        width:220px;
+        height:220px;
+        background:radial-gradient(circle, rgba(249,115,22,.25), transparent 70%);
+      }
+      .inicio__panel-head{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        margin-bottom:18px;
+      }
+      .inicio__chip{
+        background:rgba(15,118,110,.12);
+        color:#0f766e;
+        border-radius:999px;
+        padding:6px 12px;
+        font-size:.8rem;
+        font-weight:600;
+      }
+      .inicio__panel h2{
+        margin:0 0 12px;
+        font-size:1.4rem;
+      }
+      .inicio__panel p{
+        margin:0 0 16px;
+        color:rgba(15,23,42,.7);
+        line-height:1.6;
+      }
+      .inicio__lista{
+        list-style:none;
+        padding:0;
+        margin:0 0 20px;
+        display:grid;
+        gap:10px;
+      }
+      .inicio__lista li{
+        padding-left:20px;
+        position:relative;
+        color:rgba(15,23,42,.75);
+      }
+      .inicio__lista li::before{
+        content:"";
+        width:8px;
+        height:8px;
+        border-radius:50%;
+        background:#f97316;
+        position:absolute;
+        left:0;
+        top:8px;
+      }
+      .inicio__animacion{
+        animation:aparecer .7s ease both;
+      }
+      .inicio__animacion.retraso-1{ animation-delay:.1s; }
+      .inicio__animacion.retraso-2{ animation-delay:.2s; }
+      .inicio__animacion.retraso-3{ animation-delay:.3s; }
+      @keyframes aparecer{
+        from{ opacity:0; transform:translateY(16px); }
+        to{ opacity:1; transform:translateY(0); }
+      }
+      @media (max-width: 980px){
+        .inicio__hero{
+          grid-template-columns:1fr;
+        }
+        .inicio__stats{
+          grid-template-columns:repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 640px){
+        .inicio__stats{
+          grid-template-columns:1fr;
+        }
+        .inicio__panel{
+          padding:20px;
+        }
+      }
+    </style>
   </head>
-  <body>
-    <main class="contenedor">
-      <section class="tarjeta">
-        <div class="encabezado">
-          <h1 style="margin:0;">Biblioteca Universitaria</h1>
-          <div id="nav"></div>
+  <body class="inicio">
+    <main class="contenedor inicio__contenedor">
+      <section class="inicio__hero">
+        <div class="inicio__copy">
+          <div class="inicio__animacion">
+            <span class="inicio__eyebrow">UNAMAD - Biblioteca</span>
+            <h1 class="inicio__titulo">Biblioteca Universitaria</h1>
+            <p class="inicio__subtitulo">
+              Accede al cat&#225;logo, gestiona tus pr&#233;stamos y reserva t&#237;tulos desde un solo lugar.
+            </p>
+          </div>
+          <div class="inicio__acciones inicio__animacion retraso-1">
+            <a class="boton boton--primario inicio__cta" href="./login.html">Ingresar</a>
+            <a class="boton boton--secundario" href="./catalogo-publico.html">Explorar cat&#225;logo</a>
+          </div>
+          <div class="inicio__stats inicio__animacion retraso-2">
+            <div class="inicio__stat">
+              <span class="inicio__stat-num">+20k</span>
+              <span class="inicio__stat-text">T&#237;tulos disponibles</span>
+            </div>
+            <div class="inicio__stat">
+              <span class="inicio__stat-num">24/7</span>
+              <span class="inicio__stat-text">Consulta en l&#237;nea</span>
+            </div>
+            <div class="inicio__stat">
+              <span class="inicio__stat-num">5 min</span>
+              <span class="inicio__stat-text">Registro r&#225;pido</span>
+            </div>
+          </div>
         </div>
-        <p style="margin-top:0;">
-          Bienvenido. Esta es una estructura base para el sistema de biblioteca.
-        </p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <a class="boton boton--primario" href="./catalogo-publico.html">Ver catálogo</a>
-          <a class="boton" href="../paginas/acceso/iniciar-sesion.html">Iniciar sesión</a>
+        <div class="inicio__panel inicio__animacion retraso-3">
+          <div class="inicio__panel-head">
+            <span class="inicio__chip">Acceso seguro</span>
+            <div id="nav"></div>
+          </div>
+          <h2>Inicia sesi&#243;n para continuar</h2>
+          <p>
+            Gestiona tus pr&#233;stamos, revisa multas y recibe recordatorios personalizados.
+          </p>
+          <ul class="inicio__lista">
+            <li>Estado de pr&#233;stamos en tiempo real</li>
+            <li>Reservas con confirmaci&#243;n inmediata</li>
+            <li>Historial acad&#233;mico centralizado</li>
+          </ul>
+          <a class="boton boton--primario inicio__cta" href="./login.html">Ingresar ahora</a>
         </div>
       </section>
     </main>
