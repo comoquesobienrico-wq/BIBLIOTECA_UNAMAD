@@ -7,13 +7,12 @@ try {
     $db = new Database();
     $conn = $db->getConnection();
 
-    // Consulta simple para verificar conectividad.
-    $stmt = sqlsrv_query($conn, 'SELECT 1 AS ok');
-    if ($stmt === false) {
-        throw new RuntimeException(print_r(sqlsrv_errors(), true));
+    $result = $conn->query('SELECT 1 AS ok');
+    if (!$result) {
+        throw new RuntimeException('Error en la consulta: ' . $conn->error);
     }
 
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+    $row = $result->fetch_assoc();
     echo json_encode([
         'status' => 'ok',
         'result' => $row['ok'] ?? null,
@@ -23,6 +22,5 @@ try {
     echo json_encode([
         'status' => 'error',
         'message' => $e->getMessage(),
-        'sqlsrv_errors' => sqlsrv_errors(),
     ]);
 }

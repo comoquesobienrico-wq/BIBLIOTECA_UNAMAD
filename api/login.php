@@ -5,9 +5,9 @@ require_once __DIR__ . '/lib/Database.php';
 
 // Ajusta estos nombres a las columnas reales de tu tabla "usuario".
 const USER_TABLE = 'usuario';
-const USERNAME_COLUMN = 'login';          // columna de usuario en la tabla
-const PASSWORD_COLUMN = 'password';       // contraseña en texto plano (si la usas)
-const PASSWORD_HASH_COLUMN = 'password_hash'; // varbinary con hash (SHA-256/512) si existe
+const USERNAME_COLUMN = 'login';
+const PASSWORD_COLUMN = 'password';
+const PASSWORD_HASH_COLUMN = 'password_hash';
 
 try {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -23,45 +23,51 @@ try {
     $db = new Database();
     $conn = $db->getConnection();
 
-    // Traemos el usuario por login y validamos el password en PHP para poder usar hash.
     $sql = sprintf(
-        'SELECT TOP 1 * FROM %s WHERE %s = ?',
+        'SELECT * FROM %s WHERE %s = ? LIMIT 1',
         USER_TABLE,
         USERNAME_COLUMN
     );
 
-    $stmt = sqlsrv_query($conn, $sql, [$username]);
-    if ($stmt === false) {
-        throw new RuntimeException(print_r(sqlsrv_errors(), true));
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new RuntimeException('Error al preparar la consulta: ' . $conn->error);
     }
 
-    $user = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+    $stmt->bind_param('s', $username);
+    if (!$stmt->execute()) {
+        throw new RuntimeException('Error al ejecutar la consulta: ' . $stmt->error);
+    }
+
+    $result = $stmt->get_result();
+    $user = $result ? $result->fetch_assoc() : null;
+
     if (!$user) {
         http_response_code(401);
         echo json_encode(['status' => 'error', 'message' => 'Credenciales incorrectas']);
         exit;
     }
 
-    // Verificación de contraseña:
     $isValid = false;
 
-    // 1) Si hay hash en varbinary, compara contra SHA-512 y SHA-256 del password ingresado.
     if (array_key_exists(PASSWORD_HASH_COLUMN, $user) && $user[PASSWORD_HASH_COLUMN] !== null) {
-        $hashSha512 = hash('sha512', $password, true); // binario (64 bytes)
-        $hashSha256 = hash('sha256', $password, true); // binario (32 bytes)
-
         $stored = $user[PASSWORD_HASH_COLUMN];
-        // sqlsrv puede devolver varbinary como stream; normalizamos a string binaria.
-        if (is_resource($stored)) {
-            $stored = stream_get_contents($stored);
-        }
 
-        if ($stored === $hashSha512 || $stored === $hashSha256) {
+        $hashSha512Bin = hash('sha512', $password, true);
+        $hashSha256Bin = hash('sha256', $password, true);
+        $hashSha512Hex = hash('sha512', $password);
+        $hashSha256Hex = hash('sha256', $password);
+
+        if (
+            hash_equals($stored, $hashSha512Bin) ||
+            hash_equals($stored, $hashSha256Bin) ||
+            hash_equals($stored, $hashSha512Hex) ||
+            hash_equals($stored, $hashSha256Hex)
+        ) {
             $isValid = true;
         }
     }
 
-    // 2) Fallback: compara texto plano si existe la columna password.
     if (!$isValid && array_key_exists(PASSWORD_COLUMN, $user) && $user[PASSWORD_COLUMN] !== null) {
         if ($user[PASSWORD_COLUMN] === $password) {
             $isValid = true;
@@ -74,7 +80,6 @@ try {
         exit;
     }
 
-    // Devuelve datos mínimos; ajusta las columnas según tu tabla.
     echo json_encode([
         'status' => 'ok',
         'user' => [
@@ -89,6 +94,5 @@ try {
     echo json_encode([
         'status' => 'error',
         'message' => $e->getMessage(),
-        'sqlsrv_errors' => sqlsrv_errors(),
     ]);
 }

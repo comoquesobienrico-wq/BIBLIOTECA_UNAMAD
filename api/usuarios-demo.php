@@ -7,15 +7,14 @@ try {
     $db = new Database();
     $conn = $db->getConnection();
 
-    // Consulta de ejemplo: lee todos los registros de la tabla usuario.
     $sql = 'SELECT * FROM usuario';
-    $stmt = sqlsrv_query($conn, $sql);
-    if ($stmt === false) {
-        throw new RuntimeException(print_r(sqlsrv_errors(), true));
+    $result = $conn->query($sql);
+    if (!$result) {
+        throw new RuntimeException('Error en la consulta: ' . $conn->error);
     }
 
     $usuarios = [];
-    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+    while ($row = $result->fetch_assoc()) {
         $usuarios[] = $row;
     }
 
@@ -29,6 +28,5 @@ try {
     echo json_encode([
         'status' => 'error',
         'message' => $e->getMessage(),
-        'sqlsrv_errors' => sqlsrv_errors(),
     ]);
 }
