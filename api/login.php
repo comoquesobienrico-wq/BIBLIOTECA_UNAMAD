@@ -1,18 +1,29 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/lib/Database.php';
+$databasePath = __DIR__ . '/lib/Database.php';
+if (!file_exists($databasePath)) {
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'No se encuentra el archivo Database.php.',
+    ]);
+    exit;
+}
 
-// Ajusta estos nombres a las columnas reales de tu tabla "usuario".
+require_once $databasePath;
+
+// Nombres reales segun la tabla "usuario".
 const USER_TABLE = 'usuario';
 const USERNAME_COLUMN = 'login';
 const PASSWORD_COLUMN = 'password';
 const PASSWORD_HASH_COLUMN = 'password_hash';
+const EMAIL_COLUMN = 'email';
 
 try {
     $input = json_decode(file_get_contents('php://input'), true);
-    $username = $input['username'] ?? null;
-    $password = $input['password'] ?? null;
+    $username = isset($input['username']) ? trim($input['username']) : null;
+    $password = isset($input['password']) ? trim($input['password']) : null;
 
     if (!$username || !$password) {
         http_response_code(400);
@@ -24,9 +35,10 @@ try {
     $conn = $db->getConnection();
 
     $sql = sprintf(
-        'SELECT * FROM %s WHERE %s = ? LIMIT 1',
+        'SELECT * FROM %s WHERE %s = ? OR %s = ? LIMIT 1',
         USER_TABLE,
-        USERNAME_COLUMN
+        USERNAME_COLUMN,
+        EMAIL_COLUMN
     );
 
     $stmt = $conn->prepare($sql);
@@ -34,7 +46,7 @@ try {
         throw new RuntimeException('Error al preparar la consulta: ' . $conn->error);
     }
 
-    $stmt->bind_param('s', $username);
+    $stmt->bind_param('ss', $username, $username);
     if (!$stmt->execute()) {
         throw new RuntimeException('Error al ejecutar la consulta: ' . $stmt->error);
     }

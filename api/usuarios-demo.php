@@ -1,7 +1,17 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/lib/Database.php';
+$databasePath = __DIR__ . '/lib/Database.php';
+if (!file_exists($databasePath)) {
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'No se encuentra el archivo Database.php.',
+    ]);
+    exit;
+}
+
+require_once $databasePath;
 
 try {
     $db = new Database();
